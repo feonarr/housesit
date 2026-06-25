@@ -926,21 +926,10 @@ Emergency contact: ${g('emg-name')} — ${g('emg-phone')}`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
-        name: name,
         email: g('email'),
         _replyto: g('email'),
-        phone: g('phone'),
-        relationship: g('relationship'),
-        contact_preference: g('contact-pref'),
-        stay_dates: dateStart + ' → ' + dateEnd,
-        address: g('address') || 'not provided',
-        pets: hasPets ? petText : 'No',
-        plants: hasPlants ? g('plants-notes') || 'Yes' : 'No',
-        mail: hasMail ? g('mail-notes') || 'Yes' : 'No',
-        other: hasOther ? g('other-notes') || 'Yes' : 'No',
-        emergency_contact_name: g('emg-name'),
-        emergency_contact_phone: g('emg-phone'),
-        _subject: 'Housesit request from ' + name + ' (' + dateStart + ' → ' + dateEnd + ')'
+        _subject: 'Housesit request from ' + name + ' (' + dateStart + ' → ' + dateEnd + ')',
+        message: body
       })
     });
     const data = await resp.json();
