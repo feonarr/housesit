@@ -922,27 +922,31 @@ Other: ${hasOther ? g('other-notes') || 'yes' : 'No'}
 Emergency contact: ${g('emg-name')} — ${g('emg-phone')}`;
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('https://formspree.io/f/xvzjkbyn', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system: 'Save this housesitting booking request to a Notion database called "Housesit Requests". Create the page with the title "<name> — <dates>" and paste all the details in the page body as plain text. If the database does not exist, create it first. Respond only with JSON: {"success": true} or {"success": false, "error": "reason"}. No markdown, no preamble.',
-        messages: [{ role: 'user', content: body }],
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }]
+        name: d.name,
+        email: d.email,
+        phone: d.phone,
+        relationship: d.relationship,
+        contact_preference: d.contactPref,
+        stay_dates: d.dateStart + ' → ' + d.dateEnd,
+        address: d.address,
+        pets: hasPets ? petText : 'No',
+        plants: hasPlants ? g('plants-notes') || 'Yes' : 'No',
+        mail: hasMail ? g('mail-notes') || 'Yes' : 'No',
+        other: hasOther ? g('other-notes') || 'Yes' : 'No',
+        emergency_contact_name: g('emg-name'),
+        emergency_contact_phone: g('emg-phone'),
+        _subject: 'Housesit request from ' + d.name + ' (' + d.dateStart + ' → ' + d.dateEnd + ')'
       })
     });
     const data = await resp.json();
-    const textBlock = data.content?.find(b => b.type === 'text');
-    let result = { success: true };
-    if (textBlock) {
-      try { result = JSON.parse(textBlock.text.replace(/```json|```/g, '').trim()); } catch {}
-    }
-    if (result.success !== false) {
+    if (resp.ok) {
       document.getElementById('form-content').style.display = 'none';
       document.getElementById('success-screen').style.display = 'block';
-    } else throw new Error(result.error || 'unknown');
+    } else throw new Error(data?.error || 'unknown');
   } catch (err) {
     btn.disabled = false;
     lbl.textContent = 'Send request';
