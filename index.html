@@ -928,6 +928,7 @@ Emergency contact: ${g('emg-name')} — ${g('emg-phone')}`;
       body: JSON.stringify({
         name: name,
         email: g('email'),
+        _replyto: g('email'),
         phone: g('phone'),
         relationship: g('relationship'),
         contact_preference: g('contact-pref'),
@@ -946,7 +947,7 @@ Emergency contact: ${g('emg-name')} — ${g('emg-phone')}`;
     if (resp.ok) {
       document.getElementById('form-content').style.display = 'none';
       document.getElementById('success-screen').style.display = 'block';
-    } else throw new Error(data?.error || 'unknown');
+    } else throw new Error(JSON.stringify(data?.errors) || data?.error || 'unknown');
   } catch (err) {
     btn.disabled = false;
     lbl.textContent = 'Send request';
